@@ -1,13 +1,5 @@
 /*
- * sim900.cpp
- * A library for SeeedStudio seeeduino GPRS shield 
- *  
- * Copyright (c) 2015 seeed technology inc.
- * Website    : www.seeed.cc
- * Author     : lawliet zou
- * Create Time: April 2015
- * Change Log :
- *
+ * SIM800L.cpp
  * The MIT License (MIT)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,29 +21,29 @@
  * THE SOFTWARE.
  */
 
-#include "sim900.h"
+#include "SIM800L.h"
 
-SoftwareSerial *serialSIM900 = NULL;
+SoftwareSerial *serialSIM800L = NULL;
 
-void  sim900_init(void * uart_device, uint32_t baud)
+void  SIM800L_init(void * uart_device, uint32_t baud)
 {
-    serialSIM900 = (SoftwareSerial*)uart_device;
-	serialSIM900->begin(baud);
+    serialSIM800L = (SoftwareSerial*)uart_device;
+	serialSIM800L->begin(baud);
 }
 
-int sim900_check_readable()
+int SIM800L_check_readable()
 {
-    return serialSIM900->available();
+    return serialSIM800L->available();
 }
 
-int sim900_wait_readable (int wait_time)
+int SIM800L_wait_readable (int wait_time)
 {
     unsigned long timerStart;
     int dataLen = 0;
     timerStart = millis();
     while((unsigned long) (millis() - timerStart) > wait_time * 1000UL) {
         delay(500);
-        dataLen = sim900_check_readable();
+        dataLen = SIM800L_check_readable();
         if(dataLen > 0){
             break;
         }
@@ -59,22 +51,22 @@ int sim900_wait_readable (int wait_time)
     return dataLen;
 }
 
-void sim900_flush_serial()
+void SIM800L_flush_serial()
 {
-    while(sim900_check_readable()){
-        char c = serialSIM900->read();
+    while(SIM800L_check_readable()){
+        char c = serialSIM800L->read();
     }
 }
 
-void sim900_read_buffer(char *buffer, int count, unsigned int timeout, unsigned int chartimeout)
+void SIM800L_read_buffer(char *buffer, int count, unsigned int timeout, unsigned int chartimeout)
 {
     int i = 0;
     unsigned long timerStart, prevChar;
     timerStart = millis();
     prevChar = 0;
     while(1) {
-        while (sim900_check_readable()) {
-            char c = serialSIM900->read();
+        while (SIM800L_check_readable()) {
+            char c = serialSIM800L->read();
             prevChar = millis();
             buffer[i++] = c;
             if(i >= count)break;
@@ -90,7 +82,7 @@ void sim900_read_buffer(char *buffer, int count, unsigned int timeout, unsigned 
     }
 }
 
-void sim900_clean_buffer(char *buffer, int count)
+void SIM800L_clean_buffer(char *buffer, int count)
 {
     for(int i=0; i < count; i++) {
         buffer[i] = '\0';
@@ -98,50 +90,50 @@ void sim900_clean_buffer(char *buffer, int count)
 }
 
 //HACERR quitar esta funcion ?
-void sim900_send_byte(uint8_t data)
+void SIM800L_send_byte(uint8_t data)
 {
-	serialSIM900->write(data);
+	serialSIM800L->write(data);
 }
 
-void sim900_send_char(const char c)
+void SIM800L_send_char(const char c)
 {
-	serialSIM900->write(c);
+	serialSIM800L->write(c);
 }
 
-void sim900_send_cmd(const char* cmd)
+void SIM800L_send_cmd(const char* cmd)
 {
   for(int i=0; i<strlen(cmd); i++)
     {
-        sim900_send_byte(cmd[i]);
+        SIM800L_send_byte(cmd[i]);
     }
 }
 
-void sim900_send_cmd(const __FlashStringHelper* cmd)
+void SIM800L_send_cmd(const __FlashStringHelper* cmd)
 {
   int i = 0;
   const char *ptr = (const char *) cmd;
   while (pgm_read_byte(ptr + i) != 0x00) {
-    sim900_send_byte(pgm_read_byte(ptr + i++));  
+    SIM800L_send_byte(pgm_read_byte(ptr + i++));  
   }
 }
 
-void sim900_send_cmd_P(const char* cmd)
+void SIM800L_send_cmd_P(const char* cmd)
 {
   while (pgm_read_byte(cmd) != 0x00)
-    sim900_send_byte(pgm_read_byte(cmd++));  
+    SIM800L_send_byte(pgm_read_byte(cmd++));  
 }
 
-void sim900_send_AT(void)
+void SIM800L_send_AT(void)
 {
-    sim900_check_with_cmd(F("AT\r\n"),"OK",CMD);
+    SIM800L_check_with_cmd(F("AT\r\n"),"OK",CMD);
 }
 
-void sim900_send_End_Mark(void)
+void SIM800L_send_End_Mark(void)
 {
-    sim900_send_byte((char)26);
+    SIM800L_send_byte((char)26);
 }
 
-boolean sim900_wait_for_resp(const char* resp, DataType type, unsigned int timeout, unsigned int chartimeout)
+boolean SIM800L_wait_for_resp(const char* resp, DataType type, unsigned int timeout, unsigned int chartimeout)
 {
     int len = strlen(resp);
     int sum = 0;
@@ -149,8 +141,8 @@ boolean sim900_wait_for_resp(const char* resp, DataType type, unsigned int timeo
     timerStart = millis();
     prevChar = 0;
     while(1) {
-        if(sim900_check_readable()) {
-            char c = serialSIM900->read();
+        if(SIM800L_check_readable()) {
+            char c = serialSIM800L->read();
             prevChar = millis();
             sum = (c==resp[sum]) ? sum+1 : 0;
             if(sum == len)break;
@@ -165,21 +157,21 @@ boolean sim900_wait_for_resp(const char* resp, DataType type, unsigned int timeo
         
     }
     //If is a CMD, we will finish to read buffer.
-    if(type == CMD) sim900_flush_serial();
+    if(type == CMD) SIM800L_flush_serial();
     return true;   
 }
 
 
-boolean sim900_check_with_cmd(const char* cmd, const char *resp, DataType type, unsigned int timeout, unsigned int chartimeout)
+boolean SIM800L_check_with_cmd(const char* cmd, const char *resp, DataType type, unsigned int timeout, unsigned int chartimeout)
 {
-    sim900_send_cmd(cmd);
-    return sim900_wait_for_resp(resp,type,timeout,chartimeout);
+    SIM800L_send_cmd(cmd);
+    return SIM800L_wait_for_resp(resp,type,timeout,chartimeout);
 }
 
 //HACERR que tambien la respuesta pueda ser FLASH STRING
-boolean sim900_check_with_cmd(const __FlashStringHelper* cmd, const char *resp, DataType type, unsigned int timeout, unsigned int chartimeout)
+boolean SIM800L_check_with_cmd(const __FlashStringHelper* cmd, const char *resp, DataType type, unsigned int timeout, unsigned int chartimeout)
 {
-    sim900_send_cmd(cmd);
-    return sim900_wait_for_resp(resp,type,timeout,chartimeout);
+    SIM800L_send_cmd(cmd);
+    return SIM800L_wait_for_resp(resp,type,timeout,chartimeout);
 }
 

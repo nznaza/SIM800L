@@ -1,13 +1,4 @@
 /*
- * GPRS_Shield_Arduino.h 
- * A library for SeeedStudio seeeduino GPRS shield 
- *  
- * Copyright (c) 2015 seeed technology inc.
- * Website    : www.seeed.cc
- * Author     : lawliet zou
- * Create Time: April 2015
- * Change Log :
- *
  * The MIT License (MIT)
   *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +23,7 @@
 #ifndef __GPRS_SHIELD_ARDUINO_H__
 #define __GPRS_SHIELD_ARDUINO_H__
 
-#include "sim900.h"
+#include "SIM800L.h"
 
 /** GPRS class.
  *  used to realize GPRS communication
@@ -158,7 +149,7 @@ public:
     bool disableCLIPring(void);
 	
 	/** Get Subscriber Number (your number) using AT+CNUM command, but if nothing returns, then
-	 *  you need to command this to your SIM900. (See AT+CPBS, AT+CPBW)
+	 *  you need to command this to your SIM800L. (See AT+CPBS, AT+CPBW)
 	 *	AT+CPBS="ON"
 	 *	AT+CPBW=1,"+{Your Number}",145
 	 *	AT+CPBS="SM"
@@ -176,14 +167,14 @@ public:
      */
     bool isCallActive(char *number);  
 
-    /** get DateTime from SIM900 (see AT command: AT+CLTS=1) as string
+    /** get DateTime from SIM800L (see AT command: AT+CLTS=1) as string
      *  @param
      *  @returns
      *      true on success
      *      false on error
      */        
     bool getDateTime(char *buffer);
-	/** get Signal Strength from SIM900 (see AT command: AT+CSQ) as integer
+	/** get Signal Strength from SIM800L (see AT command: AT+CSQ) as integer
 	*  @param
 	*  @returns
 	*      true on success
@@ -225,7 +216,7 @@ public:
     void disconnect(void);
     
     /** Open a tcp/udp connection with the specified host on the specified port
-     *  @param socket an endpoint of an inter-process communication flow of GPRS module,for SIM900 module, it is in [0,6]
+     *  @param socket an endpoint of an inter-process communication flow of GPRS module,for SIM800L module, it is in [0,6]
      *  @param ptl protocol for socket, TCP/UDP can be choosen
      *  @param host host (can be either an ip address or a name. If a name is provided, a dns request will be established)
      *  @param port port
