@@ -1,13 +1,4 @@
 /*
- * GPRS_Shield_Arduino.cpp
- * A library for SeeedStudio seeeduino GPRS shield 
- *  
- * Copyright (c) 2015 seeed technology inc.
- * Website    : www.seeed.cc
- * Author     : lawliet zou
- * Create Time: April 2015
- * Change Log :
- *
  * The MIT License (MIT)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -585,7 +576,7 @@ bool GPRS::join(const __FlashStringHelper *apn, const __FlashStringHelper *userN
     if (NULL != strstr(ipAddr,"ERROR")) {
 		return false;
 	}
-    s = ipAddr + 12;
+    s = ipAddr + 11;
     p = strstr((char *)(s),"\r\n"); //p is last character \r\n
     if (NULL != s) {
         i = 0;
@@ -738,7 +729,6 @@ int GPRS::send(const char * str, int len)
     return len;
 }
     
-
 int GPRS::recv(char* buf, int len)
 {
     SIM800L_clean_buffer(buf,len);
@@ -782,6 +772,7 @@ unsigned long GPRS::getIPnumber()
 {
     return _ip;
 }
+
 /* NOT USED bool GPRS::gethostbyname(const char* host, uint32_t* ip)
 {
     uint32_t addr = str_to_ip(host);
@@ -839,4 +830,65 @@ bool GPRS::getLocation(const __FlashStringHelper *apn, float *longitude, float *
 		return true;
 	}
 	return false;
+}
+
+void GPRS::BatteryStatus()
+{    	
+	//AT+CBC\r						--> 6 + CR = 7
+	//\r\n
+	//+CBC: 0,100,4800				--> CRLF + 16 + CRLF = 18
+	//\r\n						
+	//OK	
+	
+	int i = 0;
+    char BBuffer[30];
+	char bbffr[5];
+    char *s;
+
+	SIM800L_flush_serial();
+	SIM800L_send_cmd("AT+CBC\r");
+	
+	SIM800L_clean_buffer(BBuffer,30);
+    SIM800L_read_buffer(BBuffer,30);
+	//Serial.println(BBuffer);
+	
+    
+	if(NULL != ( s = strstr(BBuffer,"+CBC:")))
+	{
+		s = strstr((char *)s, ",");
+		//s = s+1;
+		//Serial.println(s);
+		//Serial.println(bbffr);
+		i=0;
+		while(*(++s) !=  ',')
+			bbffr[i++]=*s;
+	//	Serial.println(*s);
+	//	Serial.println(bbffr);
+		
+		percent = atoi(bbffr);
+		//Serial.println(percent);
+		
+		//Serial.println(bbffr);
+		
+		bbffr[i] = 0;
+		i=0;
+		while(*(++s) !=  '\r')
+			bbffr[i++]=*s;
+		
+		bbffr[i] = 0;
+		milivolts = atoi(bbffr);
+		//Serial.println(milivolts);
+		return;
+	}
+}
+
+int GPRS::BatteryP()
+{
+    //I have already a buffer with ip_string: snprintf(ip_string, sizeof(ip_string), "%d.%d.%d.%d", (_ip>>24)&0xff,(_ip>>16)&0xff,(_ip>>8)&0xff,_ip&0xff); 
+    return percent;
+}
+int GPRS::BatterymV()
+{
+    //I have already a buffer with ip_string: snprintf(ip_string, sizeof(ip_string), "%d.%d.%d.%d", (_ip>>24)&0xff,(_ip>>16)&0xff,(_ip>>8)&0xff,_ip&0xff); 
+    return milivolts;
 }

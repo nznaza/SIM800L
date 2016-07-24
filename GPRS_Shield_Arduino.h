@@ -290,6 +290,10 @@ public:
     char* getIPAddress();
     unsigned long getIPnumber();	
     bool getLocation(const __FlashStringHelper *apn, float *longitude, float *latitude);
+	void BatteryStatus();
+	int BatteryP();
+	int BatterymV();
+
 	
 private:
     bool checkSIMStatus(void);
@@ -298,5 +302,7 @@ private:
     static GPRS* inst;
     uint32_t _ip;
     char ip_string[16]; //XXX.YYY.ZZZ.WWW + \0
+	uint32_t percent;
+	uint32_t milivolts;
 };
 #endif
