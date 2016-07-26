@@ -62,6 +62,11 @@ public:
      *      true on success
      *      false on error
      */
+	 
+	 
+	void end(void);
+
+
     bool checkPowerUp(void);
 
     

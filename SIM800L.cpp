@@ -30,6 +30,10 @@ void  SIM800L_init(void * uart_device, uint32_t baud)
     serialSIM800L = (SoftwareSerial*)uart_device;
 	serialSIM800L->begin(baud);
 }
+void  SIM800L_end()
+{
+	serialSIM800L->end();
+}
 
 int SIM800L_check_readable()
 {

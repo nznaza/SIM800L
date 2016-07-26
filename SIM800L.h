@@ -36,6 +36,7 @@ enum DataType {
 };
 
 void  SIM800L_init(void * uart_device, uint32_t baud);
+void  SIM800L_end();
 int   SIM800L_check_readable();
 int   SIM800L_wait_readable(int wait_time);
 void  SIM800L_flush_serial();

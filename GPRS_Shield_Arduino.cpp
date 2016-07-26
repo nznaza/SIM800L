@@ -47,6 +47,11 @@ bool GPRS::init(void)
     return true;
 }
 
+void GPRS::end(void)
+{
+   SIM800L_end;
+}
+
 bool GPRS::checkPowerUp(void)
 {
   return SIM800L_check_with_cmd("AT\r\n","OK\r\n",CMD);
